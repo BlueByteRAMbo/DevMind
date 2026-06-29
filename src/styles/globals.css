@@ -1,0 +1,142 @@
+/* ============================================================
+   DevMind — Global Styles
+   All layout primitives live here. Components use Tailwind tokens.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Brand gradient — used via CSS variable so it can be referenced in arbitrary styles */
+:root {
+  --gradient-brand: linear-gradient(90deg, #7C6AF7 0%, #C45EE0 50%, #F0904D 100%);
+  --gradient-brand-subtle: linear-gradient(90deg, rgba(124,106,247,0.15) 0%, rgba(196,94,224,0.08) 50%, rgba(240,144,77,0.15) 100%);
+}
+
+/* Base resets */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: #0D0D0F;
+  color: #C8C8D4;
+  font-family: "Inter", system-ui, sans-serif;
+  line-height: 1.6;
+  min-height: 100dvh;
+  overflow: hidden;
+}
+
+#root {
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #2A2A30;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #3A3A44;
+}
+
+/* Selection */
+::selection {
+  background: rgba(124, 106, 247, 0.3);
+  color: #F0F0F4;
+}
+
+/* Brand gradient text utility */
+.text-gradient-brand {
+  background: var(--gradient-brand);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Fade-in animation for block creation */
+@keyframes fadeInSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-block-in {
+  animation: fadeInSlideUp 0.25s ease-out forwards;
+}
+
+/* Pulse glow for AI loading */
+@keyframes glowPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(124, 106, 247, 0); }
+  50%        { box-shadow: 0 0 0 6px rgba(124, 106, 247, 0.15); }
+}
+
+.animate-glow-pulse {
+  animation: glowPulse 2s ease-in-out infinite;
+}
+
+/* Shimmer for skeletons */
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position:  200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    #1C1C20 25%,
+    #242428 50%,
+    #1C1C20 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s ease-in-out infinite;
+}
+
+/* Backdrop blur utility (used by modals) */
+.backdrop-blur-app {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Focus ring */
+.focus-ring:focus-visible {
+  outline: 2px solid #7C6AF7;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Textarea reset */
+textarea {
+  resize: none;
+  font-family: inherit;
+}
+
+/* Editable content */
+[contenteditable]:focus {
+  outline: none;
+}
