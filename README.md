@@ -120,23 +120,27 @@ Open [http://localhost:5173](http://localhost:5173) in your browser. AI features
 
 ## ☁️ Deploying to Production (Vercel)
 
-DevMind is designed to be easily deployed to Vercel, taking advantage of their Serverless Functions for the AI proxy.
+DevMind is designed to be easily deployed to Vercel, taking advantage of their Serverless Functions for the AI proxy. The easiest way to deploy is directly from your GitHub repository.
 
-1. Install the Vercel CLI (or deploy by importing your repo in the Vercel Dashboard):
-```bash
-npm i -g vercel
-```
-2. Link and deploy your project:
-```bash
-vercel
-```
-3. **IMPORTANT**: When deploying to Vercel, you must add your environment variables in the Vercel Dashboard (**Settings > Environment Variables**):
+### Option A: Deploy via GitHub (Recommended)
+1. Go to [Vercel](https://vercel.com/new) and log in.
+2. Click **Import** next to your `devmind` GitHub repository.
+3. In the **Environment Variables** section, add your 3 required keys:
    - `VITE_SUPABASE_URL`
    - `VITE_SUPABASE_ANON_KEY`
    - `GEMINI_API_KEY`
-   - `CLAUDE_API_KEY` (optional)
+4. Click **Deploy**. Vercel will automatically build the app and deploy it. It will also auto-update every time you push to the `main` branch.
 
-Once configured, deploy to production:
+### Option B: Deploy via Vercel CLI
+1. Install the Vercel CLI:
+```bash
+npm i -g vercel
+```
+2. Link and deploy your project (you must add env vars in the Vercel Dashboard afterwards):
+```bash
+vercel
+```
+3. Once configured, deploy to production:
 ```bash
 vercel --prod
 ```

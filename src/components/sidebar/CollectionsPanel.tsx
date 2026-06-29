@@ -97,7 +97,7 @@ export const CollectionsPanel: React.FC = () => {
                 {/* Collection row */}
                 <div className="flex items-center gap-2 px-3 py-2 bg-bg-card hover:bg-bg-hover transition-colors group">
                   <button
-                    onClick={() => setExpandedId(isExpanded ? null : col.id)}
+                    onClick={() => setExpandedId(isExpanded ? null : col.id!)}
                     className="flex-1 flex items-center gap-2 text-left min-w-0"
                   >
                     <svg
@@ -113,7 +113,7 @@ export const CollectionsPanel: React.FC = () => {
                   </button>
                   <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
                     <button
-                      onClick={() => handleRename(col.id)}
+                      onClick={() => handleRename(col.id!)}
                       className="p-0.5 text-text-muted hover:text-text-body rounded"
                       title="Rename"
                     >
@@ -123,7 +123,7 @@ export const CollectionsPanel: React.FC = () => {
                       </svg>
                     </button>
                     <button
-                      onClick={() => handleRemove(col.id)}
+                      onClick={() => handleRemove(col.id!)}
                       className="p-0.5 text-text-muted hover:text-accent-red rounded"
                       title="Delete"
                     >
@@ -167,7 +167,7 @@ export const CollectionsPanel: React.FC = () => {
                               <input
                                 type="checkbox"
                                 checked={inCol}
-                                onChange={() => handleToggleTopic(col.id, t.id)}
+                                onChange={() => handleToggleTopic(col.id!, t.id)}
                                 className="accent-[#7C6AF7] w-3 h-3 rounded"
                               />
                               <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ backgroundColor: t.colour }} />

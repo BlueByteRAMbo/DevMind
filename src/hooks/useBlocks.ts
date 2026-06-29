@@ -6,7 +6,7 @@
 import { useCallback } from "react";
 import { v4 as uuid } from "uuid";
 import { db } from "../lib/db";
-import type { Block, BlockType } from "../types";
+import type { Block } from "../types";
 import { useAppStore } from "../store/appStore";
 
 export function useBlocks() {
@@ -80,7 +80,7 @@ export function useBlocks() {
 
   /** Reorder blocks by dragging — updates the `order` field of all affected blocks. */
   const reorder = useCallback(
-    async (topicId: string, orderedIds: string[]): Promise<void> => {
+    async (_topicId: string, orderedIds: string[]): Promise<void> => {
       await db.transaction("rw", db.blocks, async () => {
         for (let i = 0; i < orderedIds.length; i++) {
           await db.blocks.update(orderedIds[i], {

@@ -20,7 +20,6 @@ interface AIBlockProps {
 
 export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
   const [content, setContent] = useState(block.content);
-  const [isEditing, setIsEditing] = useState(!block.content);
   const [prompt, setPrompt] = useState("");
   const [showPrompt, setShowPrompt] = useState(!block.content);
   const { update, remove, togglePin } = useBlocks();

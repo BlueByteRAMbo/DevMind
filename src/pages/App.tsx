@@ -295,25 +295,6 @@ const MobileTabBar: React.FC = () => {
   );
 };
 
-// ── Mobile Topics overlay ─────────────────────────────────────
-const MobileTopicsOverlay: React.FC = () => {
-  const mobileTab = useAppStore((s) => s.mobileTab);
-  const setMobileTab = useAppStore((s) => s.setMobileTab);
-  const selectedTopicId = useAppStore((s) => s.selectedTopicId);
-
-  // Auto-close when a topic is selected
-  useEffect(() => {
-    if (selectedTopicId && mobileTab === "topics") {
-      // Small delay to let the user see the selection
-      const t = setTimeout(() => {
-        // Keep the tab on topics but let canvas show
-      }, 300);
-      return () => clearTimeout(t);
-    }
-  }, [selectedTopicId, mobileTab]);
-
-  return null; // The sidebar is shown in the layout below
-};
 
 // ── Main App ──────────────────────────────────────────────────
 export const App: React.FC = () => {
