@@ -100,12 +100,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic, onDelete, onRename,
         </span>
       )}
 
-      {/* Mastery % */}
-      {!renaming && (topic.masteryPercent ?? 0) > 0 && (
-        <span className="text-[10px] text-text-muted font-mono">
-          {topic.masteryPercent ?? 0}%
-        </span>
-      )}
+
 
       {/* Action buttons (visible on hover) */}
       {!renaming && (

@@ -197,47 +197,55 @@ export function useSync() {
 
   }, [user]);
 
-// Real-time sync listeners (Supabase Realtime) and fallback polling
-useEffect(() => {
-  if (!user) return;
-  // Realtime channel
-  const channel = supabase
-    .channel('public:topics_blocks')
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'topics' }, async (payload: any) => {
-      const t = payload.new;
-      if ((t as any)?.user_id !== user?.id) return;
-      const mapped: Topic = {
-        id: t.id,
-        name: t.name,
-        colour: t.colour,
-        collectionId: t.collection_id,
-        createdAt: new Date(t.created_at),
-        updatedAt: new Date(t.updated_at),
-        masteryPercent: t.mastery_percent ?? 0,
-      };
-      await db.topics.put(mapped);
-    })
-    .on('postgres_changes', { event: '*', schema: 'public', table: 'blocks' }, async (payload: any) => {
-      const b = payload.new;
-      if (b?.user_id !== user.id) return;
-      const mapped: Block = {
-        id: b.id,
-        topicId: b.topic_id,
-        type: b.type,
-        content: b.content,
-        sourceUrl: b.source_url ?? undefined,
-        sourceTitle: b.source_title ?? undefined,
-        imageUrl: b.image_url ?? undefined,
-        ocrText: b.ocr_text ?? null,
-        order: b.order ?? 0,
-        isPinned: b.is_pinned ?? false,
-        tags: b.tags ?? [],
-        createdAt: new Date(b.created_at),
-        updatedAt: new Date(b.updated_at),
-        syncStatus: "synced",
-      };
-      await db.blocks.put(mapped);
-    })
+  // Real-time sync listeners (Supabase Realtime) and fallback polling
+  useEffect(() => {
+    if (!user) return;
+    // Realtime channel
+    const channel = supabase
+      .channel('public:topics_blocks')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'topics' }, async (payload: any) => {
+        if (payload.eventType === 'DELETE') {
+          if (payload.old?.id) await db.topics.delete(payload.old.id);
+          return;
+        }
+        const t = payload.new;
+        if ((t as any)?.user_id !== user?.id) return;
+        const mapped: Topic = {
+          id: t.id,
+          name: t.name,
+          colour: t.colour,
+          collectionId: t.collection_id,
+          createdAt: new Date(t.created_at),
+          updatedAt: new Date(t.updated_at),
+          masteryPercent: t.mastery_percent ?? 0,
+        };
+        await db.topics.put(mapped);
+      })
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'blocks' }, async (payload: any) => {
+        if (payload.eventType === 'DELETE') {
+          if (payload.old?.id) await db.blocks.delete(payload.old.id);
+          return;
+        }
+        const b = payload.new;
+        if (b?.user_id !== user.id) return;
+        const mapped: Block = {
+          id: b.id,
+          topicId: b.topic_id,
+          type: b.type,
+          content: b.content,
+          sourceUrl: b.source_url ?? undefined,
+          sourceTitle: b.source_title ?? undefined,
+          imageUrl: b.image_url ?? undefined,
+          ocrText: b.ocr_text ?? null,
+          order: b.order ?? 0,
+          isPinned: b.is_pinned ?? false,
+          tags: b.tags ?? [],
+          createdAt: new Date(b.created_at),
+          updatedAt: new Date(b.updated_at),
+          syncStatus: "synced",
+        };
+        await db.blocks.put(mapped);
+      })
     .subscribe((status: any) => {
       if (status === 'SUBSCRIPTION_ERROR') {
         console.warn('[useSync] Realtime subscription failed, fallback to polling');

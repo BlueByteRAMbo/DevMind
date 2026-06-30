@@ -34,6 +34,8 @@ import { HandwrittenBlock } from "../blocks/HandwrittenBlock";
 import { SynthesisBlock } from "../blocks/SynthesisBlock";
 import { BlockSkeleton } from "../ui/Skeleton";
 
+import { useLiveBlocks } from "../../hooks/useLiveBlocks";
+
 // ── Sortable wrapper ──────────────────────────────────────────
 interface SortableBlockProps {
   block: Block;
@@ -84,27 +86,16 @@ const SortableBlock: React.FC<SortableBlockProps> = ({ block, onDeleted }) => {
 // ── Canvas ─────────────────────────────────────────────────────
 export const Canvas: React.FC = () => {
   const selectedTopicId = useAppStore((s) => s.selectedTopicId);
+  const liveBlocks = useLiveBlocks();
+  const { reorder } = useBlocks();
   const [blocks, setBlocks] = useState<Block[]>([]);
   const [loading, setLoading] = useState(true);
-  const { getAll, reorder } = useBlocks();
 
-  const loadBlocks = useCallback(async () => {
-    if (!selectedTopicId) {
-      setBlocks([]);
-      setLoading(false);
-      return;
-    }
-    const data = await getAll(selectedTopicId);
-    setBlocks(data);
-    setLoading(false);
-  }, [selectedTopicId, getAll]);
-
+  // Sync liveBlocks to local blocks state to allow optimistic drag and drop
   useEffect(() => {
-    setLoading(true);
-    loadBlocks();
-    const interval = setInterval(loadBlocks, 1500);
-    return () => clearInterval(interval);
-  }, [loadBlocks]);
+    setBlocks(liveBlocks);
+    setLoading(false);
+  }, [liveBlocks]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
@@ -170,7 +161,7 @@ export const Canvas: React.FC = () => {
                   <div key={block.id} className="group">
                     <SortableBlock
                       block={block}
-                      onDeleted={loadBlocks}
+                      onDeleted={() => {}}
                     />
                   </div>
                 ))}
@@ -181,7 +172,7 @@ export const Canvas: React.FC = () => {
       </div>
 
       {/* Add block row — always visible at the bottom */}
-      <AddBlockRow onBlockAdded={loadBlocks} />
+      <AddBlockRow onBlockAdded={() => {}} />
     </div>
   );
 };

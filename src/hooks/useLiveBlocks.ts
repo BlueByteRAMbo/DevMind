@@ -24,8 +24,11 @@ export function useLiveBlocks() {
         .where("topicId")
         .equals(selectedTopicId)
         .toArray();
+      // Filter out soft-deleted blocks
+      const active = all.filter((b) => b.syncStatus !== "deleted");
+
       // sort by pinned then order, same as useBlocks
-      return all.sort((a, b) => {
+      return active.sort((a, b) => {
         if (a.isPinned && !b.isPinned) return -1;
         if (!a.isPinned && b.isPinned) return 1;
         return a.order - b.order;
@@ -44,48 +47,5 @@ export function useLiveBlocks() {
     return cleanup;
   }, [subscribe]);
 
-  // Re‑export CRUD helpers same as useBlocks for convenience
-  const create = async (partial: Omit<Block, "id" | "createdAt" | "updatedAt" | "syncStatus">) => {
-    const now = new Date();
-    const { v4: uuid } = await import("uuid");
-    const block: Block = {
-      ...partial,
-      id: uuid(),
-      createdAt: now,
-      updatedAt: now,
-      syncStatus: "pending",
-    };
-    await db.blocks.put(block);
-    return block;
-  };
-
-  const update = async (id: string, patch: Partial<Omit<Block, "id" | "createdAt">>) => {
-    await db.blocks.update(id, { ...patch, updatedAt: new Date(), syncStatus: "pending" });
-  };
-
-  const remove = async (id: string) => {
-    const block = await db.blocks.get(id);
-    await db.blocks.delete(id);
-    if (block?.topicId) {
-      const count = await db.blocks.where("topicId").equals(block.topicId).count();
-      const mastery = Math.min(100, Math.round((Math.log(count + 1) / Math.log(51)) * 100));
-      await db.topics.update(block.topicId, { masteryPercent: mastery, updatedAt: new Date() });
-    }
-  };
-
-  const reorder = async (_topicId: string, orderedIds: string[]) => {
-    await db.transaction("rw", db.blocks, async () => {
-      for (let i = 0; i < orderedIds.length; i++) {
-        await db.blocks.update(orderedIds[i], { order: i, updatedAt: new Date(), syncStatus: "pending" });
-      }
-    });
-  };
-
-  const togglePin = async (id: string) => {
-    const block = await db.blocks.get(id);
-    if (!block) return;
-    await db.blocks.update(id, { isPinned: !block.isPinned, updatedAt: new Date(), syncStatus: "pending" });
-  };
-
-  return { blocks, create, update, remove, reorder, togglePin };
+  return blocks;
 }
