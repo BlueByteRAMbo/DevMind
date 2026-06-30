@@ -86,7 +86,6 @@ create table blocks (
 alter table blocks enable row level security;
 create policy "Users own their blocks" on blocks for all using (auth.uid() = user_id);
 
--- Collections table
 create table collections (
   id text primary key,
   user_id uuid references auth.users on delete cascade not null,
@@ -96,11 +95,17 @@ create table collections (
 );
 alter table collections enable row level security;
 create policy "Users own their collections" on collections for all using (auth.uid() = user_id);
+
+-- Storage bucket for OCR scans
+INSERT INTO storage.buckets (id, name, public) VALUES ('handwritten-scans', 'handwritten-scans', true);
+CREATE POLICY "Allow authenticated uploads" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'handwritten-scans');
+CREATE POLICY "Allow authenticated updates" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'handwritten-scans');
+CREATE POLICY "Allow public read" ON storage.objects FOR SELECT TO public USING (bucket_id = 'handwritten-scans');
 ```
 </details>
 
 3. In Supabase, go to **Authentication > Providers** and ensure **Email** is enabled (and Google OAuth if desired).
-4. Go to **Storage > Buckets** and create a public bucket named `handwritten_scans` for OCR images.
+4. The SQL script above automatically creates the public `handwritten-scans` bucket and its required security policies for image uploads.
 
 ### 4. Configure Environment Variables
 Copy the template file to create your local environment variables:
