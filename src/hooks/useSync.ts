@@ -135,7 +135,7 @@ export function useSync() {
           source_title: block.sourceTitle ?? null,
           image_url: block.imageUrl ?? null,
           ocr_text: block.ocrText ?? null,
-          order: block.order,
+          order: block.order > 2147483647 ? 0 : block.order,
           is_pinned: block.isPinned,
           tags: block.tags,
           created_at: block.createdAt.toISOString(),

@@ -8,6 +8,7 @@ import type { BlockType } from "../../types";
 import { useBlocks } from "../../hooks/useBlocks";
 import { useTopics } from "../../hooks/useTopics";
 import { useAppStore } from "../../store/appStore";
+import { db } from "../../lib/db";
 
 interface BlockTypeOption {
   type: BlockType;
@@ -37,11 +38,13 @@ export const AddBlockRow: React.FC<AddBlockRowProps> = ({ onBlockAdded }) => {
   const handleAdd = async (type: BlockType) => {
     if (!selectedTopicId) return;
 
+    const blockCount = await db.blocks.where("topicId").equals(selectedTopicId).count();
+
     await create({
       topicId: selectedTopicId,
       type,
       content: "",
-      order: Date.now(),
+      order: blockCount,
       isPinned: false,
       tags: [],
     });
