@@ -58,7 +58,7 @@ graph TD
     end
 
     UI <-->|Instant Reads/Writes| Dexie
-    Dexie <-.->|Push/Pull (Every 15s)| Sync
+    Dexie <-->|Push/Pull (Every 15s)| Sync
     Sync <-->|REST / Realtime| Supa
     UI -->|Image Uploads| Storage
     UI -->|Smart Prompts| AIProxy
