@@ -40,9 +40,14 @@ export function useImageUpload() {
         const imageUrl = await uploadHandwrittenScan(file, user.id, blockId);
 
         // Step 2: Run OCR in background (don't block UI)
-        const ocrText = await ocr(imageUrl);
+        let ocrText = null;
+        try {
+          ocrText = await ocr(imageUrl);
+        } catch (ocrErr) {
+          console.warn("OCR failed, image still uploaded:", ocrErr);
+        }
 
-        return { imageUrl, ocrText: ocrText || null };
+        return { imageUrl, ocrText: ocrText || "" };
       } catch (err) {
         const msg = err instanceof Error ? err.message : "Upload failed";
         setError(msg);

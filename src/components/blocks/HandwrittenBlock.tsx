@@ -48,10 +48,10 @@ export const HandwrittenBlock: React.FC<HandwrittenBlockProps> = ({
 
       if (remoteUrl) {
         setImageUrl(remoteUrl);
-        if (text) setOcrText(text);
+        setOcrText(text || "");
         await update(block.id, {
           imageUrl: remoteUrl,
-          ocrText: text,
+          ocrText: text || "",
         });
       }
     },
@@ -222,12 +222,12 @@ export const HandwrittenBlock: React.FC<HandwrittenBlockProps> = ({
             <div className="flex items-center justify-between">
               <span className="text-xs text-text-muted">Extracted Text</span>
               {uploading && <Spinner size="sm" />}
-              {!uploading && ocrText && !editingOcr && (
+              {!uploading && !editingOcr && (
                 <button
                   onClick={(e) => { e.stopPropagation(); setEditingOcr(true); }}
                   className="text-[11px] text-accent-purple hover:text-accent-purple2 transition-colors"
                 >
-                  Edit
+                  {ocrText ? "Edit" : "Add Text"}
                 </button>
               )}
             </div>
