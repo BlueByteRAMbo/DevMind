@@ -140,3 +140,11 @@ textarea {
 [contenteditable]:focus {
   outline: none;
 }
+
+/* Custom glow for specific icons */
+.icon-glow {
+  filter: drop-shadow(0 0 8px currentColor);
+}
+.hover-icon-glow:hover {
+  filter: drop-shadow(0 0 8px currentColor);
+}

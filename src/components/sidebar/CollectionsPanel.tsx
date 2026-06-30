@@ -67,7 +67,7 @@ export const CollectionsPanel: React.FC = () => {
         className="w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold text-text-muted uppercase tracking-wider hover:text-text-body transition-colors"
       >
         <span className="flex items-center gap-1.5">
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3.5 h-3.5 icon-glow text-accent-purple" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
               d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
           </svg>
@@ -124,7 +124,7 @@ export const CollectionsPanel: React.FC = () => {
                     </button>
                     <button
                       onClick={() => handleRemove(col.id!)}
-                      className="p-0.5 text-text-muted hover:text-accent-red rounded"
+                      className="p-0.5 text-text-muted hover:text-accent-red hover:drop-shadow-[0_0_8px_currentColor] rounded"
                       title="Delete"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">

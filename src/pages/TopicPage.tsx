@@ -50,7 +50,7 @@ export const TopicPage: React.FC = () => {
       className="ml-2 p-1.5 rounded-md text-text-muted hover:text-text-body hover:bg-bg-hover transition-colors"
       aria-label="Export topic to PDF"
     >
-      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 icon-glow text-accent-teal" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path d="M4 4h16v16H4z" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
         <path d="M8 12h8M8 16h8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
       </svg>
