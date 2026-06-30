@@ -21,6 +21,10 @@ const TOPIC_COLOURS = [
 ];
 
 export const TopicSidebar: React.FC = () => {
+  const { getAll, create, remove, update } = useTopics();
+  const setMobileSidebarOpen = useAppStore((s) => s.setMobileSidebarOpen);
+  const user = useAppStore((s) => s.user);
+
   const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);

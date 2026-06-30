@@ -101,9 +101,9 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic, onDelete, onRename,
       )}
 
       {/* Mastery % */}
-      {!renaming && topic.masteryPercent > 0 && (
+      {!renaming && (topic.masteryPercent ?? 0) > 0 && (
         <span className="text-[10px] text-text-muted font-mono">
-          {topic.masteryPercent}%
+          {topic.masteryPercent ?? 0}%
         </span>
       )}
 
