@@ -91,4 +91,10 @@ CREATE TRIGGER blocks_updated_at
 
 -- ── Supabase Storage bucket ───────────────────────────────────
 -- Run this in the Supabase dashboard SQL editor (storage API not available in migrations)
+-- 1. Create the bucket
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('handwritten-scans', 'handwritten-scans', true);
+--
+-- 2. Create policies for the bucket (run in SQL editor as well)
+-- CREATE POLICY "Allow authenticated uploads" ON storage.objects FOR INSERT TO authenticated WITH CHECK (bucket_id = 'handwritten-scans');
+-- CREATE POLICY "Allow authenticated updates" ON storage.objects FOR UPDATE TO authenticated USING (bucket_id = 'handwritten-scans');
+-- CREATE POLICY "Allow public read" ON storage.objects FOR SELECT TO public USING (bucket_id = 'handwritten-scans');
