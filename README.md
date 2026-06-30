@@ -57,9 +57,9 @@ graph TD
         Gemini[Google Gemini AI]
     end
 
-    UI <-->|Instant Reads/Writes| Dexie
-    Dexie <-->|Push/Pull (Every 15s)| Sync
-    Sync <-->|REST / Realtime| Supa
+    UI -->|Instant Reads/Writes| Dexie
+    Dexie -->|Push/Pull (Every 15s)| Sync
+    Sync -->|REST / Realtime| Supa
     UI -->|Image Uploads| Storage
     UI -->|Smart Prompts| AIProxy
     AIProxy -->|API Call| Gemini
