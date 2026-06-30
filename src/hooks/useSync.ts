@@ -61,6 +61,10 @@ export function useSync() {
       if (blocks) {
         for (const b of blocks) {
           const local = await db.blocks.get(b.id);
+          // Skip if the block is locally marked for deletion but hasn't synced yet
+          if (local && local.syncStatus === "deleted") {
+            continue;
+          }
           const serverUpdated = new Date(b.updated_at).getTime();
           const localUpdated = local
             ? new Date(local.updatedAt).getTime()
@@ -145,6 +149,19 @@ export function useSync() {
 
         if (!error) {
           await db.blocks.update(block.id!, { syncStatus: "synced" });
+        }
+      }
+
+      // Process deleted blocks
+      const deletedBlocks = await db.blocks
+        .where("syncStatus")
+        .equals("deleted")
+        .toArray();
+
+      for (const block of deletedBlocks) {
+        const { error } = await supabase.from("blocks").delete().eq("id", block.id);
+        if (!error) {
+          await db.blocks.delete(block.id!);
         }
       }
 

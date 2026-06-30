@@ -59,8 +59,10 @@ export const HandwrittenBlock: React.FC<HandwrittenBlockProps> = ({
   );
 
   const handleDelete = useCallback(async () => {
-    await remove(block.id!);
-    onDeleted?.();
+    if (window.confirm("Are you sure you want to delete this block?")) {
+      await remove(block.id!);
+      onDeleted?.();
+    }
   }, [block.id, remove, onDeleted]);
 
   const handleOcrSave = useCallback(async () => {

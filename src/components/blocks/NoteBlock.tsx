@@ -32,8 +32,10 @@ export const NoteBlock: React.FC<NoteBlockProps> = ({ block, onDeleted }) => {
   }, [block.id, content, update]);
 
   const handleDelete = useCallback(async () => {
-    await remove(block.id!);
-    onDeleted?.();
+    if (window.confirm("Are you sure you want to delete this block?")) {
+      await remove(block.id!);
+      onDeleted?.();
+    }
   }, [block.id, remove, onDeleted]);
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {

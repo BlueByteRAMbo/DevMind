@@ -32,8 +32,16 @@ export const URLBlock: React.FC<URLBlockProps> = ({ block, onDeleted }) => {
   const [title, setTitle] = useState(block.sourceTitle || "");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editing, setEditing] = useState(false);
+  const [draftContent, setDraftContent] = useState("");
   const { update, remove, togglePin } = useBlocks();
   const setSelectedBlockId = useAppStore((s) => s.setSelectedBlockId);
+
+  const handleSaveEdit = async () => {
+    await update(block.id!, { content: draftContent });
+    setContent(draftContent);
+    setEditing(false);
+  };
 
   const handleFetch = useCallback(async () => {
     if (!url.trim()) return;
@@ -90,8 +98,10 @@ TITLE: [title]
   }, [url, update, block.id]);
 
   const handleDelete = useCallback(async () => {
-    await remove(block.id!);
-    onDeleted?.();
+    if (window.confirm("Are you sure you want to delete this block?")) {
+      await remove(block.id!);
+      onDeleted?.();
+    }
   }, [block.id, remove, onDeleted]);
 
   return (
@@ -171,16 +181,42 @@ TITLE: [title]
             <Spinner size="sm" />
             <span>Extracting content...</span>
           </div>
-        ) : error ? (
-          <p className="text-sm text-accent-red">{error}</p>
+        ) : error && !editing ? (
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-accent-red">{error}</p>
+            <button
+              onClick={(e) => { e.stopPropagation(); setDraftContent(content); setEditing(true); }}
+              className="text-[11px] text-blue-400 hover:text-blue-300 self-start transition-colors"
+            >
+              Add Text Manually
+            </button>
+          </div>
+        ) : editing ? (
+          <div className="flex flex-col gap-2">
+            <textarea
+              value={draftContent}
+              onChange={(e) => setDraftContent(e.target.value)}
+              rows={6}
+              className="w-full bg-bg-hover border border-border rounded-md text-sm text-text-body p-2 outline-none focus:ring-1 focus:ring-blue-500 leading-relaxed"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="flex gap-1.5 justify-end mt-1">
+              <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" size="sm" onClick={handleSaveEdit}>
+                Save
+              </Button>
+            </div>
+          </div>
         ) : content ? (
-          <div className="space-y-2">
+          <div className="space-y-2 relative group/content">
             {url && (
               <a
                 href={url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 truncate"
+                className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 truncate pr-10"
                 onClick={(e) => e.stopPropagation()}
               >
                 <svg className="w-3 h-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -189,12 +225,26 @@ TITLE: [title]
                 {extractDomain(url)}
               </a>
             )}
+            <button
+              onClick={(e) => { e.stopPropagation(); setDraftContent(content); setEditing(true); }}
+              className="absolute top-0 right-0 opacity-0 group-hover/content:opacity-100 text-[11px] text-blue-400 hover:text-blue-300 transition-opacity bg-bg-card pl-2"
+            >
+              Edit
+            </button>
             <p className="text-sm text-text-body leading-relaxed line-clamp-6 whitespace-pre-wrap">
               {content}
             </p>
           </div>
         ) : (
-          <p className="text-sm text-text-muted italic">Paste a URL above to clip the content.</p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-text-muted italic">Paste a URL above to clip the content.</p>
+            <button
+              onClick={(e) => { e.stopPropagation(); setDraftContent(""); setEditing(true); }}
+              className="text-[11px] text-blue-400 hover:text-blue-300 self-start transition-colors"
+            >
+              Add Text Manually
+            </button>
+          </div>
         )}
       </div>
 

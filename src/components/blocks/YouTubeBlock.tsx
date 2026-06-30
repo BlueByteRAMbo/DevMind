@@ -54,8 +54,10 @@ export const YouTubeBlock: React.FC<YouTubeBlockProps> = ({ block, onDeleted }) 
   }, [note, update, block.id]);
 
   const handleDelete = useCallback(async () => {
-    await remove(block.id!);
-    onDeleted?.();
+    if (window.confirm("Are you sure you want to delete this block?")) {
+      await remove(block.id!);
+      onDeleted?.();
+    }
   }, [block.id, remove, onDeleted]);
 
   return (

@@ -18,11 +18,13 @@ export function useBlocks() {
       const tid = topicId ?? selectedTopicId;
       if (!tid) return [];
       const blocks = await db.blocks.where("topicId").equals(tid).toArray();
-      return blocks.sort((a, b) => {
-        if (a.isPinned && !b.isPinned) return -1;
-        if (!a.isPinned && b.isPinned) return 1;
-        return a.order - b.order;
-      });
+      return blocks
+        .filter((b) => b.syncStatus !== "deleted")
+        .sort((a, b) => {
+          if (a.isPinned && !b.isPinned) return -1;
+          if (!a.isPinned && b.isPinned) return 1;
+          return a.order - b.order;
+        });
     },
     [selectedTopicId]
   );
@@ -69,13 +71,13 @@ export function useBlocks() {
   /** Delete a block (optimistic) and recalculate topic mastery. */
   const remove = useCallback(async (id: string): Promise<void> => {
     const block = await db.blocks.get(id);
-    await db.blocks.delete(id);
+    if (!block) return;
+    await db.blocks.update(id, { syncStatus: "deleted", updatedAt: new Date() });
     // Recalculate mastery now that block count has changed
-    if (block?.topicId) {
-      const blockCount = await db.blocks.where("topicId").equals(block.topicId).count();
-      const mastery = Math.min(100, Math.round((Math.log(blockCount + 1) / Math.log(51)) * 100));
-      await db.topics.update(block.topicId, { masteryPercent: mastery, updatedAt: new Date() });
-    }
+    const allBlocks = await db.blocks.where("topicId").equals(block.topicId).toArray();
+    const activeCount = allBlocks.filter(b => b.syncStatus !== "deleted").length;
+    const mastery = Math.min(100, Math.round((Math.log(activeCount + 1) / Math.log(51)) * 100));
+    await db.topics.update(block.topicId, { masteryPercent: mastery, updatedAt: new Date() });
   }, []);
 
   /** Reorder blocks by dragging — updates the `order` field of all affected blocks. */

@@ -38,7 +38,7 @@ export interface Block {
   tags: string[];
   createdAt: Date;
   updatedAt: Date;
-  syncStatus: "synced" | "pending" | "conflict";
+  syncStatus: "synced" | "pending" | "conflict" | "deleted";
 }
 
 export interface Collection {

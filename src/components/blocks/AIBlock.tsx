@@ -22,9 +22,17 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
   const [content, setContent] = useState(block.content);
   const [prompt, setPrompt] = useState("");
   const [showPrompt, setShowPrompt] = useState(!block.content);
+  const [editing, setEditing] = useState(false);
+  const [draftContent, setDraftContent] = useState("");
   const { update, remove, togglePin } = useBlocks();
   const { ask, loading } = useAI();
   const setSelectedBlockId = useAppStore((s) => s.setSelectedBlockId);
+
+  const handleSaveEdit = async () => {
+    await update(block.id!, { content: draftContent });
+    setContent(draftContent);
+    setEditing(false);
+  };
 
   const handleAsk = useCallback(async () => {
     if (!prompt.trim()) return;
@@ -47,8 +55,10 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
   }, [block.sourceTitle, prompt, ask, update, block.id]);
 
   const handleDelete = useCallback(async () => {
-    await remove(block.id!);
-    onDeleted?.();
+    if (window.confirm("Are you sure you want to delete this block?")) {
+      await remove(block.id!);
+      onDeleted?.();
+    }
   }, [block.id, remove, onDeleted]);
 
   return (
@@ -126,8 +136,32 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
             <Spinner size="sm" />
             <span>Thinking...</span>
           </div>
+        ) : editing ? (
+          <div className="flex flex-col gap-2">
+            <textarea
+              value={draftContent}
+              onChange={(e) => setDraftContent(e.target.value)}
+              rows={6}
+              className="w-full bg-bg-hover border border-border rounded-md text-sm text-text-body p-2 outline-none focus:ring-1 focus:ring-accent-purple leading-relaxed font-mono"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="flex gap-1.5 justify-end mt-1">
+              <Button variant="ghost" size="sm" onClick={() => setEditing(false)}>
+                Cancel
+              </Button>
+              <Button variant="primary" size="sm" onClick={handleSaveEdit}>
+                Save
+              </Button>
+            </div>
+          </div>
         ) : content ? (
-          <div className="space-y-1">
+          <div className="space-y-1 relative group/content">
+            <button
+              onClick={(e) => { e.stopPropagation(); setDraftContent(content); setEditing(true); }}
+              className="absolute top-0 right-0 opacity-0 group-hover/content:opacity-100 text-[11px] text-accent-purple hover:text-accent-purple2 transition-opacity bg-bg-card pl-2"
+            >
+              Edit
+            </button>
             <p className="text-sm text-text-body leading-relaxed whitespace-pre-wrap font-mono">
               {content}
             </p>
@@ -141,7 +175,15 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
             )}
           </div>
         ) : (
-          <p className="text-sm text-text-muted italic">Enter a prompt above to get an AI response.</p>
+          <div className="flex flex-col gap-2">
+            <p className="text-sm text-text-muted italic">Enter a prompt above to get an AI response.</p>
+            <button
+              onClick={(e) => { e.stopPropagation(); setDraftContent(""); setEditing(true); }}
+              className="text-[11px] text-accent-purple hover:text-accent-purple2 self-start transition-colors"
+            >
+              Add Text Manually
+            </button>
+          </div>
         )}
       </div>
 
