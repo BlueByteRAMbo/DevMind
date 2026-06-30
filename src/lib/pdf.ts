@@ -1,12 +1,12 @@
 // src/lib/pdf.ts
 
 import { jsPDF } from "jspdf";
+import html2canvas from "html2canvas";
 import { db } from "../lib/db";
-import type { Block } from "../types";
 
 /**
- * Export a topic and all its blocks (including images) to a downloadable PDF.
- * The PDF is generated on the client side using jsPDF.
+ * Export a topic and all its blocks (including images and styling) to a downloadable PDF.
+ * This captures the visual representation "as it is" using html2canvas.
  */
 export async function exportTopicToPDF(topicId: string): Promise<void> {
   const topic = await db.topics.get(topicId);
@@ -14,61 +14,41 @@ export async function exportTopicToPDF(topicId: string): Promise<void> {
     throw new Error("Topic not found");
   }
 
-  const blocks: Block[] = await db.blocks.where("topicId").equals(topicId).toArray();
-
-  const doc = new jsPDF();
-  const margin = 10;
-  let cursorY = margin;
-
-  // Title
-  doc.setFontSize(20);
-  doc.text(topic.name, margin, cursorY);
-  cursorY += 12;
-
-  doc.setFontSize(12);
-
-  for (const block of blocks) {
-    // If the block is an image (handwritten scan) and has an imageUrl, embed it.
-    if (block.type === "handwritten_scan" && block.imageUrl) {
-      try {
-        const response = await fetch(block.imageUrl);
-        const blob = await response.blob();
-        const dataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        const format = dataUrl.startsWith("data:image/png") ? "PNG" : "JPEG";
-        const pageWidth = doc.internal.pageSize.getWidth() - margin * 2;
-        // Preserve aspect ratio: let jsPDF calculate height automatically by passing 0 for height.
-        doc.addImage(dataUrl, format, margin, cursorY, pageWidth, 0);
-        // Approximate height after image is added; jsPDF does not expose it directly.
-        cursorY += pageWidth * 0.75; // rough estimate (adjust as needed)
-      } catch (e) {
-        console.warn("Failed to embed image for block", block.id, e);
-      }
-    } else {
-      // Regular text block – render its content.
-      const text = block.content;
-      const maxWidth = doc.internal.pageSize.getWidth() - margin * 2;
-      const lines = doc.splitTextToSize(text, maxWidth);
-      // Add a new page if needed.
-      if (cursorY + lines.length * 6 > doc.internal.pageSize.getHeight() - margin) {
-        doc.addPage();
-        cursorY = margin;
-      }
-      doc.text(lines, margin, cursorY);
-      cursorY += lines.length * 6 + 4;
-    }
-
-    // Add spacing between blocks.
-    if (cursorY > doc.internal.pageSize.getHeight() - margin) {
-      doc.addPage();
-      cursorY = margin;
-    }
+  const element = document.getElementById("canvas-blocks-container");
+  if (!element) {
+    throw new Error("Could not find canvas container to export");
   }
 
-  // Trigger download
-  doc.save(`${topic.name}.pdf`);
+  // Add a small visual loading state or just wait for the canvas to render
+  try {
+    const canvas = await html2canvas(element, {
+      scale: 2, // Higher resolution
+      useCORS: true, // Allow cross-origin images (Supabase storage, etc.)
+      backgroundColor: "#16181D", // Match bg-bg-base for dark mode consistency
+      logging: false,
+    });
+
+    const imgData = canvas.toDataURL("image/png");
+
+    // Calculate dimensions to make a single continuous page (receipt style)
+    // so no blocks get awkwardly cut in half across pages.
+    const pdfWidth = canvas.width;
+    const pdfHeight = canvas.height;
+
+    // jsPDF expects orientation 'p' (portrait) or 'l' (landscape)
+    const orientation = pdfWidth > pdfHeight ? "l" : "p";
+    
+    // Create a custom-sized PDF to fit the exact captured dimension
+    const pdf = new jsPDF({
+      orientation,
+      unit: "px",
+      format: [pdfWidth, pdfHeight],
+    });
+
+    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+    pdf.save(`${topic.name}.pdf`);
+  } catch (error) {
+    console.error("Failed to generate visual PDF:", error);
+    alert("Failed to generate PDF. Check console for details.");
+  }
 }

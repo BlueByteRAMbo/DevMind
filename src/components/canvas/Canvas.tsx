@@ -165,7 +165,7 @@ export const Canvas: React.FC = () => {
               items={blocks.map((b) => b.id!)}
               strategy={verticalListSortingStrategy}
             >
-              <div className="space-y-3 pl-6">
+              <div id="canvas-blocks-container" className="space-y-3 pl-6 pb-6 bg-bg-base">
                 {blocks.map((block) => (
                   <div key={block.id} className="group">
                     <SortableBlock
