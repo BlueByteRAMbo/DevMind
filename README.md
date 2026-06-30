@@ -9,13 +9,14 @@
 
 ## ✨ Features
 
-- **⚡ Local-First & Offline Ready**: Uses `Dexie.js` for instant, offline database reads and optimistic writes. 
+- **⚡ Local-First & Offline Ready**: Uses `Dexie.js` for instant, offline database reads and optimistic writes.
 - **🔄 Cloud Sync**: Seamlessly syncs your knowledge base to Supabase in the background.
 - **🧠 AI Synthesis (Gemini & Claude)**: Generate study notes, extract key points, and create quizzes directly from your materials.
 - **📸 Handwritten OCR**: Upload photos of your handwritten notes and DevMind will extract the text automatically using Gemini Vision.
 - **🔗 Smart URL Clipping**: Paste any URL, and DevMind automatically fetches and extracts the readable content, stripping out ads and noise.
 - **📋 Versatile Block Types**: Build topics using rich blocks — own notes, AI responses, URL clips, YouTube videos, and handwritten scans.
 - **🗂️ Collections & Mastery**: Group topics into collections and track your mastery percentage as you add more blocks.
+- **📄 Export to PDF**: Export an entire topic—including all blocks and any embedded images—as a downloadable PDF (client‑side via jsPDF).
 - **📱 PWA & Mobile Optimized**: Installable as a Progressive Web App (PWA) with a dedicated mobile layout.
 
 ## 🚀 Tech Stack
@@ -53,7 +54,7 @@ npm install
 -- Topics table
 create table topics (
   id text primary key,
-  user_id uuid references auth.users not null,
+  user_id uuid references auth.users on delete cascade not null,
   name text not null,
   colour text not null,
   collection_id text,
@@ -67,7 +68,7 @@ create policy "Users own their topics" on topics for all using (auth.uid() = use
 -- Blocks table
 create table blocks (
   id text primary key,
-  user_id uuid references auth.users not null,
+  user_id uuid references auth.users on delete cascade not null,
   topic_id text references topics(id) on delete cascade,
   type text not null,
   content text not null,
@@ -88,7 +89,7 @@ create policy "Users own their blocks" on blocks for all using (auth.uid() = use
 -- Collections table
 create table collections (
   id text primary key,
-  user_id uuid references auth.users not null,
+  user_id uuid references auth.users on delete cascade not null,
   name text not null,
   topic_ids text[] default '{}',
   created_at timestamptz default now()

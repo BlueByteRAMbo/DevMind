@@ -12,9 +12,10 @@ interface TopicItemProps {
   topic: Topic;
   onDelete?: (id: string) => void;
   onRename?: (id: string, newName: string) => void;
+  onDeletePending?: (id: string) => void;
 }
 
-export const TopicItem: React.FC<TopicItemProps> = ({ topic, onDelete, onRename }) => {
+export const TopicItem: React.FC<TopicItemProps> = ({ topic, onDelete, onRename, onDeletePending }) => {
   const selectedTopicId = useAppStore((s) => s.selectedTopicId);
   const setSelectedTopicId = useAppStore((s) => s.setSelectedTopicId);
   const [renaming, setRenaming] = useState(false);
@@ -113,7 +114,7 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic, onDelete, onRename 
           {onRename && (
             <button
               onClick={startRename}
-              className="p-0.5 rounded text-text-muted hover:text-text-body"
+              className="p-2 rounded text-text-muted hover:text-text-body"
               aria-label={`Rename topic ${topic.name}`}
               title="Rename"
             >
@@ -126,8 +127,8 @@ export const TopicItem: React.FC<TopicItemProps> = ({ topic, onDelete, onRename 
           {/* Delete */}
           {onDelete && (
             <button
-              onClick={(e) => { e.stopPropagation(); onDelete(topic.id); }}
-              className="p-0.5 rounded text-text-muted hover:text-accent-red"
+              onClick={(e) => { e.stopPropagation(); onDeletePending?.(topic.id); }}
+              className="p-2 rounded text-text-muted hover:text-accent-red"
               aria-label={`Delete topic ${topic.name}`}
               title="Delete"
             >

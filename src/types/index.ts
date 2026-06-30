@@ -18,8 +18,11 @@ export interface Topic {
   collectionId?: string;
   createdAt: Date;
   updatedAt: Date;
-  masteryPercent: number;
+  /** Percentage of mastery (0‑100) for the topic */
+  masteryPercent?: number;
 }
+
+export type AIProvider = "gemini" | "claude" | "openai" | "groq" | "ollama";
 
 export interface Block {
   id?: string;           // optional — Dexie auto-generates numeric id, UUID for cloud
@@ -65,7 +68,7 @@ export interface AIMessage {
 }
 
 export interface AIProxyRequest {
-  provider: "gemini" | "claude";
+  provider: "gemini" | "claude" | "openai" | "groq" | "ollama";
   messages: AIMessage[];
   systemPrompt?: string;
   imageUrl?: string;

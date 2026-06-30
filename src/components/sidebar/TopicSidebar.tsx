@@ -28,9 +28,20 @@ export const TopicSidebar: React.FC = () => {
   const [newColour, setNewColour] = useState(TOPIC_COLOURS[0]);
   const [creating, setCreating] = useState(false);
 
-  const { getAll, create, remove, update } = useTopics();
-  const user = useAppStore((s) => s.user);
-  const setMobileSidebarOpen = useAppStore((s) => s.setMobileSidebarOpen);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (pendingDeleteId) {
+      await remove(pendingDeleteId);
+      await loadTopics();
+      setPendingDeleteId(null);
+    }
+  };
+
+  const cancelDelete = () => {
+    setPendingDeleteId(null);
+  };
+
 
   const loadTopics = useCallback(async () => {
     const all = await getAll();
@@ -122,6 +133,7 @@ export const TopicSidebar: React.FC = () => {
               topic={topic}
               onDelete={handleDelete}
               onRename={handleRename}
+              onDeletePending={setPendingDeleteId}
             />
           ))
         )}
@@ -193,6 +205,21 @@ export const TopicSidebar: React.FC = () => {
           </div>
         </div>
       </Modal>
+
+      {/* Delete Confirmation Modal */}
+      {pendingDeleteId && (
+        <Modal
+          isOpen={true}
+          onClose={cancelDelete}
+          title="Delete Topic"
+        >
+          <p className="text-sm text-text-muted">Are you sure you want to delete this topic?</p>
+          <div className="flex justify-end gap-2 mt-4">
+            <Button variant="ghost" size="sm" onClick={cancelDelete}>Cancel</Button>
+            <Button variant="primary" size="sm" onClick={confirmDelete}>Delete</Button>
+          </div>
+        </Modal>
+      )}
     </aside>
   );
 };

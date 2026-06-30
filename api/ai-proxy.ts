@@ -7,17 +7,7 @@
 
 import type { VercelRequest, VercelResponse } from "@vercel/node";
 
-interface AIMessage {
-  role: "user" | "assistant" | "system";
-  content: string;
-}
-
-interface ProxyRequest {
-  provider: "gemini" | "claude";
-  messages: AIMessage[];
-  systemPrompt?: string;
-  imageUrl?: string;
-}
+import type { AIMessage, AIProxyRequest } from "../src/types";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
