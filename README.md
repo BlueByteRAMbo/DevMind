@@ -34,10 +34,11 @@
 <div align="center">
   <sub>
     <a href="#-why-devmind">Why DevMind</a> ·
-    <a href="#%EF%B8%8F-architecture-under-the-hood">Architecture</a> ·
+    <a href="#-the-stack">Stack</a> ·
     <a href="#-get-started-in-3-minutes">Quick Start</a> ·
     <a href="#%EF%B8%8F-deploying-to-production">Deploy</a> ·
-    <a href="#-roadmap">Roadmap</a>
+    <a href="#%EF%B8%8F-roadmap">Roadmap</a> ·
+    <a href="#-faq">FAQ</a>
   </sub>
 </div>
 
@@ -59,16 +60,129 @@
 
 ### 🧩 Block types
 
-Every piece of knowledge in DevMind lives on the canvas as a **block** — drag, pin, and reorder freely.
+Every piece of knowledge in DevMind lives on the canvas as a **block** — drag, pin, and reorder freely. Each type carries its own colour-coded left border, so a glance at the timeline tells you what kind of thinking happened where.
 
-| Block | What it does |
+<table>
+<tr>
+<td width="50%">
+
+#### 📝 Note
+<img src="https://img.shields.io/badge/border-%233A3A44-3A3A44?style=flat-square" alt="neutral" />
+
+Your own freeform thoughts, typed straight onto the canvas. No AI, no fetch — just you and the page.
+
+</td>
+<td width="50%">
+
+#### 🔗 URL Clip
+<img src="https://img.shields.io/badge/border-blue-3B82F6?style=flat-square" alt="blue" />
+
+Paste any link. DevMind strips ads and chrome via the AI proxy and keeps only the readable signal — title, domain, and clean body text.
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+#### ▶️ YouTube Note
+<img src="https://img.shields.io/badge/border-red-EF4444?style=flat-square" alt="red" />
+
+Drop a YouTube URL to anchor a video alongside your own notes on it — context and commentary, side by side.
+
+</td>
+<td width="50%">
+
+#### ✍️ Handwritten Scan
+<img src="https://img.shields.io/badge/border-amber-F0904D?style=flat-square" alt="amber" />
+
+Photograph a notebook page. Uploaded straight to Supabase Storage, then transcribed by **Gemini Vision** — fully searchable, fully editable.
+
+</td>
+</tr>
+<tr>
+<td width="50%">
+
+#### 🤖 AI Response
+<img src="https://img.shields.io/badge/border-purple-7C6AF7?style=flat-square" alt="purple" />
+
+Ask a direct question and get an answer, anchored permanently in the topic timeline — no separate chat window to lose track of.
+
+</td>
+<td width="50%">
+
+#### 🧬 Synthesis
+<img src="https://img.shields.io/badge/border-teal-3ECFAD?style=flat-square" alt="teal" />
+
+The "aha" block. Ask AI to weave every other block in the topic into one coherent, personal-voice summary — with a subtle teal-tinted background to mark it as the conclusion.
+
+</td>
+</tr>
+</table>
+
+<br/>
+
+### 🎨 Design tokens
+
+DevMind ships a deliberate, dark-mode-first palette — no default Tailwind grays in sight. Every surface, border, and accent is hand-tuned:
+
+<div align="center">
+
+| | | | | | |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| ![#7C6AF7](https://img.shields.io/badge/Purple-7C6AF7?style=for-the-badge&logoColor=white&color=7C6AF7) | ![#F0904D](https://img.shields.io/badge/Amber-F0904D?style=for-the-badge&color=F0904D) | ![#3ECFAD](https://img.shields.io/badge/Teal-3ECFAD?style=for-the-badge&color=3ECFAD) | ![#E05C5C](https://img.shields.io/badge/Red-E05C5C?style=for-the-badge&color=E05C5C) | ![#4DB87A](https://img.shields.io/badge/Green-4DB87A?style=for-the-badge&color=4DB87A) | ![#9D8FFF](https://img.shields.io/badge/Purple_2-9D8FFF?style=for-the-badge&color=9D8FFF) |
+
+</div>
+
+<details>
+<summary><b>🎨 Click to see the full token table (backgrounds, borders, text)</b></summary>
+
+<br/>
+
+**Backgrounds**
+
+| Token | Hex | Usage |
+| :--- | :--- | :--- |
+| `bg-base` | `#0D0D0F` | App canvas background |
+| `bg-surface` | `#141416` | Sidebar, panels |
+| `bg-card` | `#1C1C20` | Block cards |
+| `bg-hover` | `#242428` | Hover states |
+
+**Borders**
+
+| Token | Hex | Usage |
+| :--- | :--- | :--- |
+| `border-subtle` | `#1E1E24` | Faint dividers |
+| `border` (default) | `#2A2A30` | Standard component borders |
+| `border-strong` | `#3A3A44` | Emphasized borders, neutral note blocks |
+
+**Text**
+
+| Token | Hex | Usage |
+| :--- | :--- | :--- |
+| `text-muted` | `#52525E` | Disabled / least important |
+| `text-subtle` | `#6B6B7A` | Secondary labels |
+| `text-body` | `#C8C8D4` | Default body copy |
+| `text-primary` | `#F0F0F4` | Headings, emphasis |
+
+**Accents**
+
+| Token | Hex | Used by |
+| :--- | :--- | :--- |
+| `accent-purple` | `#7C6AF7` | AI Response blocks, primary buttons |
+| `accent-purple2` | `#9D8FFF` | Purple gradient endpoint |
+| `accent-amber` | `#F0904D` | Handwritten scan blocks |
+| `accent-teal` | `#3ECFAD` | Synthesis blocks |
+| `accent-red` | `#E05C5C` | Destructive actions, delete |
+| `accent-green` | `#4DB87A` | Success / sync confirmations |
+
+**Type**
+
+| Token | Font |
 | :--- | :--- |
-| 📝 `own_note` | Your own freeform thoughts, typed straight onto the canvas |
-| 🔗 `url_clip` | Paste any link — DevMind strips the clutter and keeps the signal |
-| ▶️ `youtube_note` | Drop a YouTube URL to pull in context for note-taking alongside it |
-| ✍️ `handwritten_scan` | Photograph handwritten notes — OCR'd and made fully searchable |
-| 🤖 `ai_response` | Ask a question, get an answer, right inside the topic timeline |
-| 🧬 `synthesis` | Ask AI to weave everything in a topic into one coherent summary |
+| `font-sans` | Inter, system-ui |
+| `font-mono` | JetBrains Mono, Fira Code |
+
+</details>
 
 <br/>
 
@@ -109,6 +223,26 @@ graph TD
 ```
 
 > 💡 **Local-first, not local-only.** Every write lands in IndexedDB first — instantly — then gets queued for Supabase. Realtime subscriptions push changes from other devices back down without you ever hitting reload.
+
+<br/>
+
+### 📦 The Stack
+
+<div align="center">
+
+| Layer | Technology | Why |
+| :---: | :--- | :--- |
+| 🎨 **UI** | React `19.2` + TypeScript `6.0` | Strict types end-to-end, latest React concurrent features |
+| 💅 **Styling** | Tailwind CSS `3.4` | Custom dark-mode token system (see palette above) |
+| 🗄️ **Local DB** | Dexie.js `4.4` (IndexedDB) | Instant reads/writes, offline-first by default |
+| ☁️ **Cloud DB** | Supabase (PostgreSQL + Realtime + Auth) | RLS-secured, WebSocket sync, free tier friendly |
+| 🖱️ **Drag & Drop** | `@dnd-kit` `6.3` / `10.0` | Accessible, touch-aware sortable blocks |
+| 🐻 **State** | Zustand `5.0` | No boilerplate, no providers, just a store |
+| 📄 **PDF Export** | jsPDF `2.5` | Client-side, no server round-trip needed |
+| ⚡ **Build** | Vite `8.1` + `vite-plugin-pwa` | Installable PWA, instant HMR |
+| ☁️ **Hosting** | Vercel Serverless Functions | API keys never touch the client bundle |
+
+</div>
 
 <br/>
 
@@ -246,13 +380,77 @@ DevMind leverages **Vercel Serverless Functions** to securely proxy AI requests 
 
 ## 🗺️ Roadmap
 
-- [ ] Multi-provider AI support (OpenAI, Groq, local Ollama — not just Gemini/Claude)
-- [ ] Mobile-first polish — touch-friendly drag handles, bottom-sheet block details
-- [ ] Floating quick-capture button for instant handwritten scans
-- [ ] Collaborative topics (shared, multi-user canvases)
+<table>
+<tr><th width="30%">🎯 Theme</th><th>Planned</th></tr>
+<tr>
+<td>🤖 <b>AI Providers</b></td>
+<td>
+
+- [ ] OpenAI support alongside Gemini & Claude
+- [ ] Groq for low-latency inference
+- [ ] Local Ollama for fully offline AI
+
+</td>
+</tr>
+<tr>
+<td>📱 <b>Mobile UX</b></td>
+<td>
+
+- [ ] Touch-friendly drag handles (always visible, not hover-only)
+- [ ] Bottom-sheet block details panel
+- [ ] Larger tap targets across the canvas
+
+</td>
+</tr>
+<tr>
+<td>⚡ <b>Quick Capture</b></td>
+<td>
+
+- [ ] Always-floating camera button for instant handwritten scans
+- [ ] One-tap capture → upload → OCR pipeline
+
+</td>
+</tr>
+<tr>
+<td>🤝 <b>Collaboration</b></td>
+<td>
+
+- [ ] Shared, multi-user topics
 - [ ] Tag-based cross-topic search
 
+</td>
+</tr>
+</table>
+
 Have an idea? [Open an issue](../../issues) — this list grows with the community.
+
+<br/>
+
+## ❓ FAQ
+
+<details>
+<summary><b>Is my data private?</b></summary>
+<br/>
+Yes. Every table in Supabase is protected by Row-Level Security — your <code>user_id</code> gates every read and write at the database level, not just in the UI. Locally, everything lives in your browser's IndexedDB until you choose to sync.
+</details>
+
+<details>
+<summary><b>Does it work offline?</b></summary>
+<br/>
+Completely. DevMind is a PWA with a local-first Dexie.js layer underneath — create topics, add blocks, reorder, even export PDFs with zero connection. Sync resumes automatically the moment you're back online.
+</details>
+
+<details>
+<summary><b>What happens if I edit the same topic on two devices at once?</b></summary>
+<br/>
+Last-write-wins, compared by <code>updated_at</code> timestamp. Realtime subscriptions mean both devices typically converge within a second or two of either one saving.
+</details>
+
+<details>
+<summary><b>Can I self-host instead of using Supabase Cloud?</b></summary>
+<br/>
+Yes — Supabase is open-source and can be self-hosted. Point <code>VITE_SUPABASE_URL</code> at your own instance and everything else works unchanged.
+</details>
 
 <br/>
 
