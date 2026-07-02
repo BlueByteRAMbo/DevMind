@@ -14,12 +14,13 @@ export function useTopics() {
   const user = useAppStore((s) => s.user);
   const setSelectedTopicId = useAppStore((s) => s.setSelectedTopicId);
 
-  /** Fetch all topics from Dexie (local-first, instant). */
   const getAll = useCallback(async (): Promise<Topic[]> => {
     const all = await db.topics.toArray();
-    return all.sort(
-      (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
-    );
+    return all
+      .filter((t) => t.syncStatus !== "deleted")
+      .sort(
+        (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+      );
   }, []);
 
   /** Create a new topic in Dexie. Caller is responsible for syncing. */
@@ -33,6 +34,7 @@ export function useTopics() {
         createdAt: now,
         updatedAt: now,
         masteryPercent: 0,
+        syncStatus: "pending",
       };
       await db.topics.put(topic);
       setSelectedTopicId(topic.id);
@@ -44,7 +46,7 @@ export function useTopics() {
   /** Update a topic in Dexie. */
   const update = useCallback(
     async (id: string, patch: Partial<Omit<Topic, "id" | "createdAt">>): Promise<void> => {
-      await db.topics.update(id, { ...patch, updatedAt: new Date() });
+      await db.topics.update(id, { ...patch, updatedAt: new Date(), syncStatus: "pending" });
     },
     []
   );
@@ -52,8 +54,11 @@ export function useTopics() {
   /** Delete a topic and all its blocks from Dexie. */
   const remove = useCallback(async (id: string): Promise<void> => {
     await db.transaction("rw", db.topics, db.blocks, async () => {
-      await db.blocks.where("topicId").equals(id).delete();
-      await db.topics.delete(id);
+      const blocks = await db.blocks.where("topicId").equals(id).toArray();
+      for (const b of blocks) {
+        await db.blocks.update(b.id!, { syncStatus: "deleted", updatedAt: new Date() });
+      }
+      await db.topics.update(id, { syncStatus: "deleted", updatedAt: new Date() });
     });
   }, []);
 

@@ -32,6 +32,10 @@ export function useSync() {
       if (topics) {
         for (const t of topics) {
           const local = await db.topics.get(t.id);
+          // Skip if the topic is locally marked for deletion but hasn't synced yet
+          if (local && local.syncStatus === "deleted") {
+            continue;
+          }
           const serverUpdated = new Date(t.updated_at).getTime();
           const localUpdated = local
             ? new Date(local.updatedAt).getTime()
@@ -46,6 +50,7 @@ export function useSync() {
               createdAt: new Date(t.created_at),
               updatedAt: new Date(t.updated_at),
               masteryPercent: t.mastery_percent ?? 0,
+              syncStatus: "synced",
             };
             await db.topics.put(mapped);
           }
@@ -100,11 +105,15 @@ export function useSync() {
 
       if (collections) {
         for (const c of collections) {
+          const local = await db.collections.get(c.id);
+          if (local && local.syncStatus === "deleted") continue;
+
           await db.collections.put({
             id: c.id,
             name: c.name,
             topicIds: c.topic_ids ?? [],
             createdAt: new Date(c.created_at),
+            syncStatus: "synced",
           });
         }
       }
@@ -166,9 +175,9 @@ export function useSync() {
       }
 
       // Push pending topics
-      const pendingTopics = await db.topics.toArray();
+      const pendingTopics = await db.topics.filter(t => t.syncStatus === "pending").toArray();
       for (const topic of pendingTopics) {
-        await supabase.from("topics").upsert({
+        const { error } = await supabase.from("topics").upsert({
           id: topic.id,
           user_id: user.id,
           name: topic.name,
@@ -178,18 +187,42 @@ export function useSync() {
           updated_at: topic.updatedAt.toISOString(),
           mastery_percent: topic.masteryPercent,
         });
+        if (!error) {
+          await db.topics.update(topic.id!, { syncStatus: "synced" });
+        }
+      }
+
+      // Process deleted topics
+      const deletedTopics = await db.topics.filter(t => t.syncStatus === "deleted").toArray();
+      for (const topic of deletedTopics) {
+        const { error } = await supabase.from("topics").delete().eq("id", topic.id);
+        if (!error) {
+          await db.topics.delete(topic.id!);
+        }
       }
 
       // Push pending collections
-      const pendingCollections = await db.collections.toArray();
+      const pendingCollections = await db.collections.filter(c => c.syncStatus === "pending").toArray();
       for (const col of pendingCollections) {
-        await supabase.from("collections").upsert({
+        const { error } = await supabase.from("collections").upsert({
           id: col.id,
           user_id: user.id,
           name: col.name,
           topic_ids: col.topicIds,
           created_at: col.createdAt.toISOString(),
         });
+        if (!error) {
+          await db.collections.update(col.id!, { syncStatus: "synced" });
+        }
+      }
+
+      // Process deleted collections
+      const deletedCollections = await db.collections.filter(c => c.syncStatus === "deleted").toArray();
+      for (const col of deletedCollections) {
+        const { error } = await supabase.from("collections").delete().eq("id", col.id);
+        if (!error) {
+          await db.collections.delete(col.id!);
+        }
       }
     } catch (err) {
       console.warn("[DevMind] Push pending failed:", err);
@@ -218,6 +251,7 @@ export function useSync() {
           createdAt: new Date(t.created_at),
           updatedAt: new Date(t.updated_at),
           masteryPercent: t.mastery_percent ?? 0,
+          syncStatus: "synced",
         };
         await db.topics.put(mapped);
       })

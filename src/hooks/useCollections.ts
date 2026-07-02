@@ -12,7 +12,9 @@ import type { Collection } from "../types";
 export function useCollections() {
   const getAll = useCallback(async (): Promise<Collection[]> => {
     const all = await db.collections.toArray();
-    return all.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    return all
+      .filter((c) => c.syncStatus !== "deleted")
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
   }, []);
 
   const create = useCallback(async (name: string): Promise<Collection> => {
@@ -21,22 +23,23 @@ export function useCollections() {
       name,
       topicIds: [],
       createdAt: new Date(),
+      syncStatus: "pending",
     };
     await db.collections.put(col);
     return col;
   }, []);
 
   const rename = useCallback(async (id: string, name: string): Promise<void> => {
-    await db.collections.update(id, { name });
+    await db.collections.update(id, { name, syncStatus: "pending" });
   }, []);
 
   const remove = useCallback(async (id: string): Promise<void> => {
-    await db.collections.delete(id);
+    await db.collections.update(id, { syncStatus: "deleted" });
     // Remove this collection from any topics that referenced it
     const topics = await db.topics.toArray();
     for (const t of topics) {
       if (t.collectionId === id) {
-        await db.topics.update(t.id, { collectionId: undefined, updatedAt: new Date() });
+        await db.topics.update(t.id, { collectionId: undefined, updatedAt: new Date(), syncStatus: "pending" });
       }
     }
   }, []);

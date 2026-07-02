@@ -21,6 +21,7 @@ export interface Topic {
   updatedAt: Date;
   /** Percentage of mastery (0‑100) for the topic */
   masteryPercent?: number;
+  syncStatus?: "synced" | "pending" | "deleted";
 }
 
 export type AIProvider = "gemini" | "claude" | "openai" | "groq" | "ollama";
@@ -47,6 +48,7 @@ export interface Collection {
   name: string;
   topicIds: string[];
   createdAt: Date;
+  syncStatus?: "synced" | "pending" | "deleted";
 }
 
 export interface UserSettings {
