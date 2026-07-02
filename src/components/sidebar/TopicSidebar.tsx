@@ -14,6 +14,7 @@ import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { Modal } from "../ui/Modal";
 import { Skeleton } from "../ui/Skeleton";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 
 const TOPIC_COLOURS = [
   "#7C6AF7", "#F0904D", "#3ECFAD", "#E05C5C", "#4DB87A",
@@ -211,19 +212,13 @@ export const TopicSidebar: React.FC = () => {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      {pendingDeleteId && (
-        <Modal
-          isOpen={true}
-          onClose={cancelDelete}
-          title="Delete Topic"
-        >
-          <p className="text-sm text-text-muted">Are you sure you want to delete this topic?</p>
-          <div className="flex justify-end gap-2 mt-4">
-            <Button variant="ghost" size="sm" onClick={cancelDelete}>Cancel</Button>
-            <Button variant="primary" size="sm" onClick={confirmDelete}>Delete</Button>
-          </div>
-        </Modal>
-      )}
+      <DeleteConfirmModal
+        isOpen={!!pendingDeleteId}
+        onClose={cancelDelete}
+        onConfirm={confirmDelete}
+        title="Delete Topic"
+        message="Are you sure you want to delete this topic?"
+      />
     </aside>
   );
 };

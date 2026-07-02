@@ -9,6 +9,7 @@ import type { Topic, Collection } from "../../types";
 import { useCollections } from "../../hooks/useCollections";
 import { useAppStore } from "../../store/appStore";
 import { db } from "../../lib/db";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 
 export const CollectionsPanel: React.FC = () => {
   const [open, setOpen] = useState(false);
@@ -17,6 +18,7 @@ export const CollectionsPanel: React.FC = () => {
   const [creating, setCreating] = useState(false);
   const [newName, setNewName] = useState("");
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const { getAll, create, remove, rename, toggleTopic } = useCollections();
   const setSelectedTopicId = useAppStore((s) => s.setSelectedTopicId);
@@ -39,9 +41,12 @@ export const CollectionsPanel: React.FC = () => {
     load();
   };
 
-  const handleRemove = async (id: string) => {
-    await remove(id);
-    load();
+  const confirmDelete = async () => {
+    if (pendingDeleteId) {
+      await remove(pendingDeleteId);
+      setPendingDeleteId(null);
+      load();
+    }
   };
 
   const handleRename = async (id: string) => {
@@ -123,7 +128,7 @@ export const CollectionsPanel: React.FC = () => {
                       </svg>
                     </button>
                     <button
-                      onClick={() => handleRemove(col.id!)}
+                      onClick={() => setPendingDeleteId(col.id!)}
                       className="p-0.5 text-text-muted hover:text-accent-red hover:drop-shadow-[0_0_8px_currentColor] rounded"
                       title="Delete"
                     >
@@ -228,6 +233,15 @@ export const CollectionsPanel: React.FC = () => {
           )}
         </div>
       )}
+
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmModal
+        isOpen={!!pendingDeleteId}
+        onClose={() => setPendingDeleteId(null)}
+        onConfirm={confirmDelete}
+        title="Delete Collection"
+        message="Are you sure you want to delete this collection? This will not delete the topics inside it."
+      />
     </div>
   );
 };

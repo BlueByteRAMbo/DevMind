@@ -10,6 +10,7 @@ import { useBlocks } from "../../hooks/useBlocks";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Spinner } from "../ui/Spinner";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 import { useAppStore } from "../../store/appStore";
 import { callAIProxy } from "../../lib/gemini";
 
@@ -34,6 +35,7 @@ export const URLBlock: React.FC<URLBlockProps> = ({ block, onDeleted }) => {
   const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
   const [draftContent, setDraftContent] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { update, remove, togglePin } = useBlocks();
   const setSelectedBlockId = useAppStore((s) => s.setSelectedBlockId);
 
@@ -97,11 +99,14 @@ TITLE: [title]
     }
   }, [url, update, block.id]);
 
-  const handleDelete = useCallback(async () => {
-    if (window.confirm("Are you sure you want to delete this block?")) {
-      await remove(block.id!);
-      onDeleted?.();
-    }
+  const handleDelete = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    await remove(block.id!);
+    setShowDeleteModal(false);
+    onDeleted?.();
   }, [block.id, remove, onDeleted]);
 
   return (
@@ -254,6 +259,14 @@ TITLE: [title]
           <span className="ml-2 text-accent-amber">● pending sync</span>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete URL Clip"
+        message="Are you sure you want to delete this URL clip?"
+      />
     </div>
   );
 };

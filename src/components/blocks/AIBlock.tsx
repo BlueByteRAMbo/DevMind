@@ -11,6 +11,7 @@ import { useAI } from "../../hooks/useAI";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Spinner } from "../ui/Spinner";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 import { useAppStore } from "../../store/appStore";
 
 interface AIBlockProps {
@@ -24,6 +25,7 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
   const [showPrompt, setShowPrompt] = useState(!block.content);
   const [editing, setEditing] = useState(false);
   const [draftContent, setDraftContent] = useState("");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { update, remove, togglePin } = useBlocks();
   const { ask, loading } = useAI();
   const setSelectedBlockId = useAppStore((s) => s.setSelectedBlockId);
@@ -54,11 +56,14 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
     }
   }, [block.sourceTitle, prompt, ask, update, block.id]);
 
-  const handleDelete = useCallback(async () => {
-    if (window.confirm("Are you sure you want to delete this block?")) {
-      await remove(block.id!);
-      onDeleted?.();
-    }
+  const handleDelete = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    await remove(block.id!);
+    setShowDeleteModal(false);
+    onDeleted?.();
   }, [block.id, remove, onDeleted]);
 
   return (
@@ -194,6 +199,14 @@ export const AIBlock: React.FC<AIBlockProps> = ({ block, onDeleted }) => {
           <span className="ml-2 text-accent-amber">● pending sync</span>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete AI Response"
+        message="Are you sure you want to delete this AI response?"
+      />
     </div>
   );
 };

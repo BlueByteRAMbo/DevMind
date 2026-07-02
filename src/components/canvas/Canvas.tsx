@@ -32,6 +32,7 @@ import { URLBlock } from "../blocks/URLBlock";
 import { YouTubeBlock } from "../blocks/YouTubeBlock";
 import { HandwrittenBlock } from "../blocks/HandwrittenBlock";
 import { SynthesisBlock } from "../blocks/SynthesisBlock";
+import { LinkBlock } from "../blocks/LinkBlock";
 import { BlockSkeleton } from "../ui/Skeleton";
 
 import { useLiveBlocks } from "../../hooks/useLiveBlocks";
@@ -61,6 +62,7 @@ const SortableBlock: React.FC<SortableBlockProps> = ({ block, onDeleted }) => {
       case "youtube_note":     return <YouTubeBlock block={block} onDeleted={onDeleted} />;
       case "handwritten_scan": return <HandwrittenBlock block={block} onDeleted={onDeleted} />;
       case "synthesis":        return <SynthesisBlock block={block} onDeleted={onDeleted} />;
+      case "link":             return <LinkBlock block={block} onDeleted={onDeleted} />;
       default:                 return null;
     }
   })();

@@ -24,6 +24,7 @@ const BLOCK_TYPES: BlockTypeOption[] = [
   { type: "youtube_note",     label: "YouTube",     icon: "▶",  color: "text-red-400" },
   { type: "handwritten_scan", label: "Handwritten", icon: "✍",  color: "text-accent-amber" },
   { type: "synthesis",        label: "Synthesis",   icon: "◈",  color: "text-accent-teal" },
+  { type: "link",             label: "Link",        icon: "🔗", color: "text-cyan-400" },
 ];
 
 interface AddBlockRowProps {

@@ -9,6 +9,7 @@ import type { Block } from "../../types";
 import { useBlocks } from "../../hooks/useBlocks";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 import { useAppStore } from "../../store/appStore";
 
 interface YouTubeBlockProps {
@@ -32,6 +33,7 @@ export const YouTubeBlock: React.FC<YouTubeBlockProps> = ({ block, onDeleted }) 
   const [url, setUrl] = useState(block.sourceUrl || "");
   const [note, setNote] = useState(block.content);
   const [saving, setSaving] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { update, remove, togglePin } = useBlocks();
   const setSelectedBlockId = useAppStore((s) => s.setSelectedBlockId);
 
@@ -53,11 +55,14 @@ export const YouTubeBlock: React.FC<YouTubeBlockProps> = ({ block, onDeleted }) 
     setSaving(false);
   }, [note, update, block.id]);
 
-  const handleDelete = useCallback(async () => {
-    if (window.confirm("Are you sure you want to delete this block?")) {
-      await remove(block.id!);
-      onDeleted?.();
-    }
+  const handleDelete = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    await remove(block.id!);
+    setShowDeleteModal(false);
+    onDeleted?.();
   }, [block.id, remove, onDeleted]);
 
   return (
@@ -146,6 +151,14 @@ export const YouTubeBlock: React.FC<YouTubeBlockProps> = ({ block, onDeleted }) 
           <span className="ml-2 text-accent-amber">● pending sync</span>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete YouTube Note"
+        message="Are you sure you want to delete this YouTube note?"
+      />
     </div>
   );
 };

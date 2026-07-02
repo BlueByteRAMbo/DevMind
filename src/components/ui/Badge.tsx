@@ -39,6 +39,10 @@ const badgeConfig: Record<
     label: "Synthesis",
     classes: "bg-accent-teal/15 text-accent-teal border border-accent-teal/30",
   },
+  link: {
+    label: "Link",
+    classes: "bg-cyan-500/15 text-cyan-400 border border-cyan-500/30",
+  },
 };
 
 export const Badge: React.FC<BadgeProps> = ({ type, className = "" }) => {

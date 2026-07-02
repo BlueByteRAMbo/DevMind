@@ -9,7 +9,8 @@ export type BlockType =
   | "youtube_note"
   | "handwritten_scan"
   | "own_note"
-  | "synthesis";
+  | "synthesis"
+  | "link";
 
 export interface Topic {
   id: string;

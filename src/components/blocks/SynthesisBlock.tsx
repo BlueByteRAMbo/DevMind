@@ -11,6 +11,7 @@ import { useAI } from "../../hooks/useAI";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Spinner } from "../ui/Spinner";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 import { useAppStore } from "../../store/appStore";
 import { db } from "../../lib/db";
 
@@ -26,6 +27,7 @@ export const SynthesisBlock: React.FC<SynthesisBlockProps> = ({
   const [content, setContent] = useState(block.content);
   const [isEditing, setIsEditing] = useState(!block.content);
   const [drafting, setDrafting] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const { update, remove, togglePin } = useBlocks();
   const { synthesize } = useAI();
   const setSelectedBlockId = useAppStore((s) => s.setSelectedBlockId);
@@ -68,11 +70,14 @@ export const SynthesisBlock: React.FC<SynthesisBlockProps> = ({
     setIsEditing(false);
   }, [block.id, content, update]);
 
-  const handleDelete = useCallback(async () => {
-    if (window.confirm("Are you sure you want to delete this block?")) {
-      await remove(block.id!);
-      onDeleted?.();
-    }
+  const handleDelete = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    await remove(block.id!);
+    setShowDeleteModal(false);
+    onDeleted?.();
   }, [block.id, remove, onDeleted]);
 
   return (
@@ -186,6 +191,14 @@ export const SynthesisBlock: React.FC<SynthesisBlockProps> = ({
           <span className="ml-2 text-accent-amber">● pending sync</span>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Synthesis"
+        message="Are you sure you want to delete this synthesis block?"
+      />
     </div>
   );
 };

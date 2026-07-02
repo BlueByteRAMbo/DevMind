@@ -12,6 +12,7 @@ import { useImageUpload } from "../../hooks/useImageUpload";
 import { Badge } from "../ui/Badge";
 import { Button } from "../ui/Button";
 import { Spinner } from "../ui/Spinner";
+import { DeleteConfirmModal } from "../ui/DeleteConfirmModal";
 import { useAppStore } from "../../store/appStore";
 
 interface HandwrittenBlockProps {
@@ -26,6 +27,7 @@ export const HandwrittenBlock: React.FC<HandwrittenBlockProps> = ({
   const [ocrText, setOcrText] = useState(block.ocrText || "");
   const [imageUrl, setImageUrl] = useState(block.imageUrl || "");
   const [editingOcr, setEditingOcr] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -58,11 +60,14 @@ export const HandwrittenBlock: React.FC<HandwrittenBlockProps> = ({
     [block.id, upload, update]
   );
 
-  const handleDelete = useCallback(async () => {
-    if (window.confirm("Are you sure you want to delete this block?")) {
-      await remove(block.id!);
-      onDeleted?.();
-    }
+  const handleDelete = useCallback(() => {
+    setShowDeleteModal(true);
+  }, []);
+
+  const confirmDelete = useCallback(async () => {
+    await remove(block.id!);
+    setShowDeleteModal(false);
+    onDeleted?.();
   }, [block.id, remove, onDeleted]);
 
   const handleOcrSave = useCallback(async () => {
@@ -276,6 +281,14 @@ export const HandwrittenBlock: React.FC<HandwrittenBlockProps> = ({
           <span className="ml-2 text-accent-amber">● pending sync</span>
         )}
       </div>
+
+      <DeleteConfirmModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDelete}
+        title="Delete Handwritten Scan"
+        message="Are you sure you want to delete this scan?"
+      />
     </div>
   );
 };
